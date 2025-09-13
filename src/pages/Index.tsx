@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 import StockForm from '@/components/StockForm';
 import PortfolioChart from '@/components/PortfolioChart';
@@ -16,8 +16,33 @@ interface Stock {
   userName: string;
 }
 
+const STORAGE_KEY = 'stocktrader-portfolio';
+
 const Index = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        // Convert timestamp strings back to Date objects
+        const stocksWithDates = parsedData.map((stock: any) => ({
+          ...stock,
+          timestamp: new Date(stock.timestamp)
+        }));
+        setStocks(stocksWithDates);
+      } catch (error) {
+        console.error('Error loading data from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Save data to localStorage whenever stocks change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stocks));
+  }, [stocks]);
 
   const handleAddStock = (stock: Stock) => {
     setStocks(prev => [stock, ...prev]);
