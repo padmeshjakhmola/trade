@@ -109,7 +109,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -138,20 +137,16 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Stock Form */}
           <div className="lg:col-span-1">
             <StockForm onAddStock={handleAddStock} currentPortfolioValue={totalValue} />
           </div>
 
-          {/* Portfolio Chart */}
           <div className="lg:col-span-2">
             <PortfolioChart stocks={stocks} />
           </div>
 
-          {/* Stock List */}
           <div className="lg:col-span-3">
             <StockList
               stocks={stocks}
@@ -161,7 +156,6 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm mt-16">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center text-sm text-muted-foreground">

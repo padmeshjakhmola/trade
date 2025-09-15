@@ -30,7 +30,6 @@ const COLORS = [
 export default function PortfolioChart({ stocks }: PortfolioChartProps) {
   const [chartType, setChartType] = useState<'pie' | 'bar'>('pie');
 
-  // Aggregate stocks by name
   const aggregatedStocks = stocks.reduce((acc, stock) => {
     const existingStock = acc.find(s => s.name === stock.name);
     if (existingStock) {

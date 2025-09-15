@@ -18,7 +18,6 @@ interface Stock {
   userName: string;
 }
 
-// Predefined stocks with prices in rupees
 const PREDEFINED_STOCKS = [
   { symbol: 'TCS', name: 'Tata Consultancy Services', price: 3850 },
   { symbol: 'INFY', name: 'Infosys Limited', price: 1720 },
@@ -43,7 +42,7 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
 
-  const MAX_PORTFOLIO_VALUE = 5000000; // ₹50 lakh limit
+  const MAX_PORTFOLIO_VALUE = 5000000;
   
   const selectedStockData = PREDEFINED_STOCKS.find(stock => stock.symbol === selectedStock);
   const price = selectedStockData?.price || 0;
@@ -77,7 +76,6 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
 
     onAddStock(newStock);
     
-    // Reset form
     setSelectedStock('');
     setQuantity('');
     setUserName('');
@@ -93,7 +91,6 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Portfolio Limit Warning */}
         {currentPortfolioValue > MAX_PORTFOLIO_VALUE * 0.8 && (
           <Alert className={currentPortfolioValue > MAX_PORTFOLIO_VALUE * 0.9 ? "border-destructive/50 bg-destructive/10" : "border-warning/50 bg-warning/10"}>
             <AlertTriangle className="h-4 w-4" />
@@ -107,7 +104,6 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* User Information */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="userName" className="text-sm font-medium flex items-center gap-2">
@@ -142,7 +138,6 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
             </div>
           </div>
 
-          {/* Stock Selection */}
           <div className="space-y-2">
             <Label htmlFor="stockSelect" className="text-sm font-medium">Select Stock</Label>
             <Select value={selectedStock} onValueChange={setSelectedStock}>
@@ -165,7 +160,6 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
             </Select>
           </div>
 
-          {/* Quantity and Price Display */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="quantity" className="text-sm font-medium">Quantity</Label>
@@ -195,7 +189,6 @@ export default function StockForm({ onAddStock, currentPortfolioValue }: StockFo
             </div>
           </div>
 
-          {/* Total Value Display */}
           <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
             <div className="space-y-2">
               <div className="flex items-center justify-between">

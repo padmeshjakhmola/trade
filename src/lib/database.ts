@@ -1,10 +1,7 @@
-// Get the base URL for API calls
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    // In browser, use current origin
     return window.location.origin;
   }
-  // Fallback for server-side rendering
   return 'http://localhost:8080';
 };
 
