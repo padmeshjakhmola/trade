@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { useStocks, useAddStock, useDeleteStock } from '@/hooks/useStocks';
 import StockForm from '@/components/StockForm';
 import PortfolioChart from '@/components/PortfolioChart';
 import StockList from '@/components/StockList';
-import { TrendingUp, BarChart3, Wallet } from 'lucide-react';
+import { TrendingUp, Wallet } from 'lucide-react';
 
 interface Stock {
   id: string;
@@ -16,48 +16,47 @@ interface Stock {
   userName: string;
 }
 
-const STORAGE_KEY = 'stocktrader-portfolio';
-
 const Index = () => {
-  const [stocks, setStocks] = useState<Stock[]>([]);
-
-  // Load data from localStorage on component mount
-  useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        // Convert timestamp strings back to Date objects
-        const stocksWithDates = parsedData.map((stock: any) => ({
-          ...stock,
-          timestamp: new Date(stock.timestamp)
-        }));
-        setStocks(stocksWithDates);
-      } catch (error) {
-        console.error('Error loading data from localStorage:', error);
-      }
-    }
-  }, []);
-
-  // Save data to localStorage whenever stocks change
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stocks));
-  }, [stocks]);
+  const { data: stocks = [], isLoading, error } = useStocks();
+  const addStockMutation = useAddStock();
+  const deleteStockMutation = useDeleteStock();
 
   const handleAddStock = (stock: Stock) => {
-    setStocks(prev => [stock, ...prev]);
-    toast({
-      title: "Stock Purchased!",
-      description: `Successfully purchased ${stock.quantity} shares of ${stock.name}`,
-      className: "bg-success text-success-foreground border-success/20",
+    addStockMutation.mutate(stock, {
+      onSuccess: () => {
+        toast({
+          title: "Stock Purchased!",
+          description: `Successfully purchased ${stock.quantity} shares of ${stock.name}`,
+          className: "bg-success text-success-foreground border-success/20",
+        });
+      },
+      onError: (error) => {
+        console.error('Error adding stock:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save stock. Data saved locally as backup.",
+          variant: "destructive",
+        });
+      }
     });
   };
 
   const handleDeleteStock = (id: string) => {
-    setStocks(prev => prev.filter(stock => stock.id !== id));
-    toast({
-      title: "Transaction Deleted",
-      description: "Stock transaction has been removed from your portfolio",
+    deleteStockMutation.mutate(id, {
+      onSuccess: () => {
+        toast({
+          title: "Transaction Deleted",
+          description: "Stock transaction has been removed from your portfolio",
+        });
+      },
+      onError: (error) => {
+        console.error('Error deleting stock:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete stock from database. Removed locally as backup.",
+          variant: "destructive",
+        });
+      }
     });
   };
 
@@ -104,6 +103,28 @@ const Index = () => {
   };
 
   const totalValue = stocks.reduce((sum, stock) => sum + stock.totalValue, 0);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading portfolio data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-2">Error loading portfolio data</p>
+          <p className="text-muted-foreground text-sm">Using local data as backup</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,7 +185,7 @@ const Index = () => {
       <footer className="border-t border-border/50 bg-card/30 backdrop-blur-sm mt-16">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center text-sm text-muted-foreground">
-            <p>© 2024 StockTrader Pro. Built with React & Recharts.</p>
+            <p>© 2025 StockTrader Pro</p>
           </div>
         </div>
       </footer>
