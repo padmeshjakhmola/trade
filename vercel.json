@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/stocks.js": {
+      "maxDuration": 10
+    },
+    "api/stocks/[id].js": {
+      "maxDuration": 10
+    }
+  }
+}
