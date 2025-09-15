@@ -5,7 +5,13 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(curl:*)",
-      "Bash(node server.js)"
+      "Bash(node server.js)",
+      "Bash(rm:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(sudo rm:*)",
+      "Bash(bun install:*)",
+      "Bash(find:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

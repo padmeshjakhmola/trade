@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Trash2, DollarSign, TrendingUp } from 'lucide-react';
+import { Download, TrendingUp } from 'lucide-react';
 
 interface Stock {
   id: string;
@@ -17,10 +17,9 @@ interface Stock {
 interface StockListProps {
   stocks: Stock[];
   onExportCSV: () => void;
-  onDeleteStock: (id: string) => void;
 }
 
-export default function StockList({ stocks, onExportCSV, onDeleteStock }: StockListProps) {
+export default function StockList({ stocks, onExportCSV }: StockListProps) {
   if (stocks.length === 0) {
     return (
       <Card className="w-full bg-gradient-to-br from-card via-card to-muted/50 border-border/50">
@@ -67,28 +66,13 @@ export default function StockList({ stocks, onExportCSV, onDeleteStock }: StockL
                   <span>Qty: {stock.quantity}</span>
                   <span>@₹{stock.price.toLocaleString()}</span>
                 </div>
-                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                  <span className="truncate">{stock.userName}</span>
-                  <span>•</span>
-                  <span className="truncate">{stock.userEmail}</span>
-                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <div className="flex items-center gap-1 text-lg font-bold text-success">
-                  <span>₹{stock.totalValue.toLocaleString()}</span>
-                </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1 text-lg font-bold text-success">
+                <span>₹{stock.totalValue.toLocaleString()}</span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onDeleteStock(stock.id)}
-                className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         ))}

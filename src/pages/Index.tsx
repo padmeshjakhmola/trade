@@ -1,5 +1,5 @@
 import { toast } from '@/hooks/use-toast';
-import { useStocks, useAddStock, useDeleteStock } from '@/hooks/useStocks';
+import { useStocks, useAddStock } from '@/hooks/useStocks';
 import StockForm from '@/components/StockForm';
 import PortfolioChart from '@/components/PortfolioChart';
 import StockList from '@/components/StockList';
@@ -19,7 +19,6 @@ interface Stock {
 const Index = () => {
   const { data: stocks = [], isLoading, error } = useStocks();
   const addStockMutation = useAddStock();
-  const deleteStockMutation = useDeleteStock();
 
   const handleAddStock = (stock: Stock) => {
     addStockMutation.mutate(stock, {
@@ -41,24 +40,6 @@ const Index = () => {
     });
   };
 
-  const handleDeleteStock = (id: string) => {
-    deleteStockMutation.mutate(id, {
-      onSuccess: () => {
-        toast({
-          title: "Transaction Deleted",
-          description: "Stock transaction has been removed from your portfolio",
-        });
-      },
-      onError: (error) => {
-        console.error('Error deleting stock:', error);
-        toast({
-          title: "Error",
-          description: "Failed to delete stock from database. Removed locally as backup.",
-          variant: "destructive",
-        });
-      }
-    });
-  };
 
   const handleExportCSV = () => {
     if (stocks.length === 0) {
@@ -172,10 +153,9 @@ const Index = () => {
 
           {/* Stock List */}
           <div className="lg:col-span-3">
-            <StockList 
-              stocks={stocks} 
+            <StockList
+              stocks={stocks}
               onExportCSV={handleExportCSV}
-              onDeleteStock={handleDeleteStock}
             />
           </div>
         </div>
