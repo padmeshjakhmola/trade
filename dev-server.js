@@ -1,13 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 
 app.use(cors());
 app.use(express.json());
@@ -63,7 +63,7 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Dev server running on http://localhost:${PORT}`);
   console.log(`📊 API endpoints available:`);
   console.log(`   - POST /api/auth/register`);
   console.log(`   - POST /api/auth/login`);

@@ -4,14 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"node dev-server.js\" \"vite\"",
+    "dev:client": "vite",
+    "dev:server": "node dev-server.js",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "server": "node server.js",
-    "dev:all": "concurrently \"npm run server\" \"npm run dev\"",
-    "start": "concurrently \"node server.js\" \"vite preview --host 0.0.0.0 --port 4173\""
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
