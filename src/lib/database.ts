@@ -1,3 +1,5 @@
+import { AuthService } from './auth';
+
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     return window.location.origin;
@@ -17,10 +19,24 @@ export interface Stock {
 }
 
 export class ApiService {
+  private static getAuthHeaders() {
+    const token = AuthService.getToken();
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    };
+  }
+
   static async getAllStocks(): Promise<Stock[]> {
     try {
-      const response = await fetch(`${getApiBaseUrl()}/api/stocks`);
+      const response = await fetch(`${getApiBaseUrl()}/api/stocks`, {
+        headers: this.getAuthHeaders(),
+      });
       if (!response.ok) {
+        if (response.status === 401) {
+          AuthService.clearAuth();
+          throw new Error('Session expired. Please login again.');
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
@@ -36,13 +52,11 @@ export class ApiService {
     }
   }
 
-  static async addStock(stock: Omit<Stock, 'timestamp'> & { timestamp?: Date }): Promise<void> {
+  static async addStock(stock: Omit<Stock, 'timestamp' | 'user_email' | 'user_name'> & { timestamp?: Date }): Promise<void> {
     try {
       const response = await fetch(`${getApiBaseUrl()}/api/stocks`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: this.getAuthHeaders(),
         body: JSON.stringify({
           id: stock.id,
           name: stock.name,
@@ -50,13 +64,16 @@ export class ApiService {
           price: stock.price,
           total_value: stock.total_value,
           timestamp: stock.timestamp || new Date(),
-          user_email: stock.user_email,
-          user_name: stock.user_name
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 401) {
+          AuthService.clearAuth();
+          throw new Error('Session expired. Please login again.');
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('API Error:', error);
@@ -68,9 +85,14 @@ export class ApiService {
     try {
       const response = await fetch(`${getApiBaseUrl()}/api/stocks/${id}`, {
         method: 'DELETE',
+        headers: this.getAuthHeaders(),
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          AuthService.clearAuth();
+          throw new Error('Session expired. Please login again.');
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {

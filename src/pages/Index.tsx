@@ -3,7 +3,13 @@ import { useStocks, useAddStock } from '@/hooks/useStocks';
 import StockForm from '@/components/StockForm';
 import PortfolioChart from '@/components/PortfolioChart';
 import StockList from '@/components/StockList';
-import { TrendingUp, Wallet } from 'lucide-react';
+import { LoginForm } from '@/components/LoginForm';
+import { RegisterForm } from '@/components/RegisterForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { TrendingUp, Wallet, LogOut, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Stock {
   id: string;
@@ -17,10 +23,13 @@ interface Stock {
 }
 
 const Index = () => {
-  const { data: stocks = [], isLoading, error } = useStocks();
+  const { user, isAuthenticated, logout, loading } = useAuth();
+  const { data: stocks = [], isLoading, error, refetch } = useStocks();
   const addStockMutation = useAddStock();
+  const queryClient = useQueryClient();
+  const [isLogin, setIsLogin] = useState(true);
 
-  const handleAddStock = (stock: Stock) => {
+  const handleAddStock = (stock: Omit<Stock, 'userEmail' | 'userName'>) => {
     addStockMutation.mutate(stock, {
       onSuccess: () => {
         toast({
@@ -31,9 +40,10 @@ const Index = () => {
       },
       onError: (error) => {
         console.error('Error adding stock:', error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to save stock";
         toast({
           title: "Error",
-          description: "Failed to save stock. Data saved locally as backup.",
+          description: errorMessage,
           variant: "destructive",
         });
       }
@@ -85,6 +95,58 @@ const Index = () => {
 
   const totalValue = stocks.reduce((sum, stock) => sum + stock.totalValue, 0);
 
+  const handleReload = () => {
+    queryClient.invalidateQueries({ queryKey: ['stocks'] });
+    refetch();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-40">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-center">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-primary to-chart-2 rounded-lg">
+                  <TrendingUp className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-chart-2 bg-clip-text text-transparent">
+                    StockTrader Pro
+                  </h1>
+                  <p className="text-sm text-muted-foreground">Modern Portfolio Management</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+            <div className="w-full max-w-md">
+              {isLogin ? (
+                <LoginForm onSwitchToRegister={() => setIsLogin(false)} />
+              ) : (
+                <RegisterForm onSwitchToLogin={() => setIsLogin(true)} />
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -99,9 +161,21 @@ const Index = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-2">Error loading portfolio data</p>
-          <p className="text-muted-foreground text-sm">Using local data as backup</p>
+        <div className="text-center space-y-4">
+          <div className="space-y-2">
+            <p className="text-destructive mb-2">Error loading portfolio data</p>
+            <p className="text-muted-foreground text-sm">Please reload to try again</p>
+          </div>
+          <div className="flex gap-3 justify-center">
+            <Button onClick={handleReload} className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Reload
+            </Button>
+            <Button onClick={() => window.location.reload()} variant="outline" className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Full Reload
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -126,12 +200,22 @@ const Index = () => {
             
             <div className="flex items-center gap-4">
               <div className="text-right">
+                <p className="text-sm text-muted-foreground">Welcome, {user?.name}</p>
                 <p className="text-sm text-muted-foreground">Total Portfolio</p>
                 <p className="text-xl font-bold text-success">₹{totalValue.toLocaleString()}</p>
               </div>
               <div className="p-2 bg-success/10 rounded-lg">
                 <Wallet className="h-6 w-6 text-success" />
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>

@@ -11,7 +11,10 @@
       "Bash(sudo rm:*)",
       "Bash(bun install:*)",
       "Bash(find:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(npm run server:*)",
+      "Bash(sqlite3:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
