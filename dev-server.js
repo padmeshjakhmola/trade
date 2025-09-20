@@ -40,8 +40,8 @@ app.all('/api/stocks', async (req, res) => {
   }
 });
 
-app.all('/api/auth/:action', async (req, res) => {
-  const handler = await importAPIHandler('./api/auth.js');
+app.all('/api/auth/login', async (req, res) => {
+  const handler = await importAPIHandler('./api/auth/login.js');
   if (handler) {
     await handler(req, res);
   } else {
@@ -49,8 +49,17 @@ app.all('/api/auth/:action', async (req, res) => {
   }
 });
 
-app.all('/api/auth', async (req, res) => {
-  const handler = await importAPIHandler('./api/auth.js');
+app.all('/api/auth/register', async (req, res) => {
+  const handler = await importAPIHandler('./api/auth/register.js');
+  if (handler) {
+    await handler(req, res);
+  } else {
+    res.status(500).json({ error: 'Handler not found' });
+  }
+});
+
+app.all('/api/auth/me', async (req, res) => {
+  const handler = await importAPIHandler('./api/auth/me.js');
   if (handler) {
     await handler(req, res);
   } else {
