@@ -1,15 +1,16 @@
 {
+  "version": 2,
   "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    },
     {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist"
       }
+    },
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -25,12 +26,9 @@
   "functions": {
     "server.js": {
       "maxDuration": 10
-    },
-    "api/stocks.js": {
-      "maxDuration": 10
-    },
-    "api/stocks/[id].js": {
-      "maxDuration": 10
     }
-  }
+  },
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
 }
