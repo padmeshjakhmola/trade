@@ -34,16 +34,25 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'DELETE') {
-    const { id } = req.query;
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const pathParts = url.pathname.split('/');
+    const id = pathParts[pathParts.length - 1];
+
+    if (!id) {
+      return res.status(400).json({ error: 'Stock ID is required' });
+    }
 
     try {
-      const result = await pool.query('DELETE FROM stocks WHERE id = $1 AND user_id = $2', [id, user.userId]);
+      const result = await pool.query('DELETE FROM stocks WHERE id = $1 AND user_id = $2 RETURNING *', [id, user.userId]);
 
       if (result.rowCount === 0) {
         return res.status(404).json({ error: 'Stock not found or not authorized' });
       }
 
-      res.json({ message: 'Stock deleted successfully' });
+      res.json({
+        message: 'Stock deleted successfully',
+        deletedStock: result.rows[0]
+      });
     } catch (error) {
       console.error('Error deleting stock:', error);
       res.status(500).json({ error: 'Failed to delete stock' });

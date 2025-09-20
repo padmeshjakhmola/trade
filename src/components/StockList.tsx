@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, TrendingUp } from 'lucide-react';
+import { Download, TrendingUp, Trash2 } from 'lucide-react';
 
 interface Stock {
   id: string;
@@ -17,9 +17,10 @@ interface Stock {
 interface StockListProps {
   stocks: Stock[];
   onExportCSV: () => void;
+  onDeleteStock: (id: string) => void;
 }
 
-export default function StockList({ stocks, onExportCSV }: StockListProps) {
+export default function StockList({ stocks, onExportCSV, onDeleteStock }: StockListProps) {
   if (stocks.length === 0) {
     return (
       <Card className="w-full bg-gradient-to-br from-card via-card to-muted/50 border-border/50">
@@ -69,10 +70,25 @@ export default function StockList({ stocks, onExportCSV }: StockListProps) {
               </div>
             </div>
 
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-lg font-bold text-success">
-                <span>₹{stock.totalValue.toLocaleString()}</span>
+            <div className="flex items-center gap-2">
+              <div className="text-right">
+                <div className="flex items-center gap-1 text-lg font-bold text-success">
+                  <span>₹{stock.totalValue.toLocaleString()}</span>
+                </div>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (window.confirm(`Are you sure you want to delete ${stock.name}?`)) {
+                    onDeleteStock(stock.id);
+                  }
+                }}
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                title="Delete stock"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         ))}

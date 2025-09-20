@@ -1,5 +1,5 @@
 import { toast } from '@/hooks/use-toast';
-import { useStocks, useAddStock } from '@/hooks/useStocks';
+import { useStocks, useAddStock, useDeleteStock } from '@/hooks/useStocks';
 import StockForm from '@/components/StockForm';
 import PortfolioChart from '@/components/PortfolioChart';
 import StockList from '@/components/StockList';
@@ -26,6 +26,7 @@ const Index = () => {
   const { user, isAuthenticated, logout, loading } = useAuth();
   const { data: stocks = [], isLoading, error, refetch } = useStocks();
   const addStockMutation = useAddStock();
+  const deleteStockMutation = useDeleteStock();
   const queryClient = useQueryClient();
   const [isLogin, setIsLogin] = useState(true);
 
@@ -50,6 +51,26 @@ const Index = () => {
     });
   };
 
+  const handleDeleteStock = (id: string) => {
+    deleteStockMutation.mutate(id, {
+      onSuccess: () => {
+        toast({
+          title: "Stock Deleted!",
+          description: "Stock removed from your portfolio",
+          className: "bg-success text-success-foreground border-success/20",
+        });
+      },
+      onError: (error) => {
+        console.error('Error deleting stock:', error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to delete stock";
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    });
+  };
 
   const handleExportCSV = () => {
     if (stocks.length === 0) {
@@ -235,6 +256,7 @@ const Index = () => {
             <StockList
               stocks={stocks}
               onExportCSV={handleExportCSV}
+              onDeleteStock={handleDeleteStock}
             />
           </div>
         </div>
